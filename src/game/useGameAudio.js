@@ -77,6 +77,10 @@ export const useGameAudio = () => {
       engine = { context, master, active: false }
       engineRef.current = engine
     }
+    if (engine.active && engine.context.state === 'running') {
+      setEnabled(true)
+      return
+    }
     await engine.context.resume()
     engine.active = true
     startBackgroundTrack(engine)
@@ -118,14 +122,37 @@ export const useGameAudio = () => {
     playTone(engine.context, engine.master, 520, 0.045, 0.018, 'square', 485)
   }, [])
 
-  useEffect(() => () => {
-    const engine = engineRef.current
-    if (!engine) return
-    engine.active = false
-    window.clearTimeout(engine.musicTimer)
-    engine.trackElement?.pause()
-    engine.context.close()
-  }, [])
+  useEffect(() => {
+    // Prefer sound on from the first moment. Desktop browsers often allow
+    // this; iOS Safari may block until the first tap, so we also unlock on
+    // that first gesture without requiring the mute button.
+    let cancelled = false
+    const tryStart = () => { if (!cancelled) start() }
+    tryStart()
+
+    const unlock = () => {
+      tryStart()
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('touchstart', unlock)
+      window.removeEventListener('keydown', unlock)
+    }
+    window.addEventListener('pointerdown', unlock, { passive: true })
+    window.addEventListener('touchstart', unlock, { passive: true })
+    window.addEventListener('keydown', unlock)
+
+    return () => {
+      cancelled = true
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('touchstart', unlock)
+      window.removeEventListener('keydown', unlock)
+      const engine = engineRef.current
+      if (!engine) return
+      engine.active = false
+      window.clearTimeout(engine.musicTimer)
+      engine.trackElement?.pause()
+      engine.context.close()
+    }
+  }, [start])
 
   return { enabled, start, toggle, playStep, playConfirm, playDialogue }
 }
