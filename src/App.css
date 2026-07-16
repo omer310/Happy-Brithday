@@ -1,0 +1,426 @@
+@import url('https://fonts.googleapis.com/css2?family=Marhey:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
+
+:root {
+  color: #fff5df;
+  background: #111728;
+  font-family: 'Noto Naskh Arabic', serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; background: #111728; }
+button { font: inherit; cursor: pointer; }
+
+.game-page {
+  min-height: 100svh;
+  overflow: hidden;
+  padding: 1.2rem clamp(0.75rem, 4vw, 4rem) 2rem;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(179, 104, 109, .34), transparent 40%),
+    radial-gradient(circle at 85% 100%, rgba(57, 102, 119, .35), transparent 36%),
+    #111728;
+}
+
+.game-header {
+  width: min(1720px, 100%, calc((100svh - 150px) * 16 / 9));
+  margin: 0 auto 1rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  color: #d9c6b3;
+  gap: .5rem;
+}
+.game-header p { margin: 0; font-size: .95rem; color: #e7c878; text-align: center; }
+.header-links { justify-self: end; display: flex; align-items: center; gap: .9rem; }
+.credits-link { color: #a8aabe; font: 500 .76rem ui-monospace, monospace; text-decoration: none; transition: color .2s; }
+.credits-link:hover { color: #f1c76b; }
+.reset-link { border: 0; background: transparent; color: #a8899a; font-size: .78rem; text-decoration: underline; padding: 0; }
+.reset-link:hover { color: #ed7f87; }
+.audio-toggle {
+  border: 1px solid rgba(241, 203, 120, .45); border-radius: 4px; padding: .2rem .48rem;
+  background: rgba(38, 25, 39, .62); color: #f3d894; font-size: .75rem;
+}
+.audio-toggle[aria-pressed='true'] { border-color: #d88983; color: #fff0d1; background: rgba(154, 77, 83, .36); }
+
+.game-shell {
+  width: min(1720px, 100%, calc((100svh - 150px) * 16 / 9));
+  margin: auto;
+  position: relative;
+}
+.game-frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 960 / 540;
+  border: 1px solid rgba(246, 216, 147, .35);
+  border-radius: 10px;
+  background: #17263c;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, .45), inset 0 0 0 4px rgba(14, 17, 30, .72);
+}
+.game-frame::before {
+  content: '';
+  z-index: 3;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 7px rgba(15, 15, 31, .5);
+}
+canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; }
+
+/* Intro */
+.intro-frame { display: grid; place-items: center; }
+.intro-sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(247, 223, 155, .5), transparent 30%),
+    linear-gradient(160deg, #1c2c46 0%, #33203c 60%, #170a16 100%);
+}
+.intro-card {
+  position: relative; z-index: 1; width: min(470px, 88%); padding: clamp(1.5rem, 5vw, 2.7rem);
+  text-align: center; border: 1px solid rgba(244, 203, 117, .48); border-radius: 10px;
+  background: rgba(20, 13, 27, .72); box-shadow: 0 20px 50px rgba(0, 0, 0, .32);
+}
+.intro-card h1 { margin: .2rem 0 .6rem; font-family: 'Marhey', sans-serif; font-size: clamp(1.5rem, 4vw, 2.4rem); }
+.intro-card p:not(.eyebrow) { margin: 0 auto 1.2rem; color: #f1e1d2; line-height: 1.8; }
+.intro-card button {
+  border: 2px solid #ffe7a5; border-radius: 4px; padding: .65rem 1.4rem;
+  color: #31203b; background: #f4cb75; font-weight: 700; box-shadow: 4px 4px 0 #563849;
+}
+.intro-runner {
+  display: block; width: 64px; height: 64px; margin: 0 auto .3rem;
+  /* Row 9 is the left-facing walk row; this runner is moving toward the left. */
+  background: url('/male.png') no-repeat 0 -576px / 832px 3456px;
+  image-rendering: pixelated; animation: introWalk .7s steps(8) infinite;
+}
+
+/* Route map */
+.map-frame { display: grid; place-items: center; padding: 1.5rem; }
+.route-map { width: min(480px, 100%); text-align: center; padding: 0 .5rem; }
+.eyebrow { margin: 0 0 .3rem; color: #f1cb78; letter-spacing: .07em; font-size: .85rem; font-weight: 700; }
+.route-map h1 { margin: 0 0 1.8rem; font-family: 'Marhey', sans-serif; font-size: clamp(1.5rem, 4.5vw, 2.4rem); color: #fff5eb; }
+
+.map-path { display: flex; justify-content: center; gap: clamp(.6rem, 3vw, 1.6rem); margin-bottom: 1.6rem; }
+.map-node { display: flex; flex-direction: column; align-items: center; gap: .4rem; opacity: .55; }
+.map-node-icon {
+  width: 46px; height: 46px; display: grid; place-items: center;
+  border-radius: 50%; border: 2px solid rgba(232, 197, 118, .35);
+  font-size: 1.2rem; color: #d9c6b3; background: rgba(24, 18, 32, .5);
+}
+.map-node small { font-size: .74rem; color: #cbb6a9; }
+.map-node.done { opacity: 1; }
+.map-node.done .map-node-icon { border-color: #8fce9a; color: #8fce9a; background: rgba(80, 140, 95, .16); }
+.map-node.active { opacity: 1; }
+.map-node.active .map-node-icon { border-color: #f4cb75; color: #f4cb75; box-shadow: 0 0 0 5px rgba(244, 203, 117, .16); animation: mapPulse 1.8s ease-in-out infinite; }
+
+.route-travel {
+  height: 64px; position: relative; overflow: hidden; margin: -.3rem 0 1.25rem;
+  border-block: 1px solid rgba(232, 197, 118, .15);
+  background: linear-gradient(90deg, rgba(35, 45, 68, .45), rgba(80, 42, 60, .42));
+}
+.route-dots {
+  position: absolute; left: 10%; right: 10%; top: 37px; height: 2px;
+  background: repeating-linear-gradient(90deg, #d4a968 0 5px, transparent 5px 12px);
+  opacity: .7;
+}
+.travel-runner {
+  position: absolute; top: 1px; width: 64px; height: 64px;
+  background-image: url('/male.png'); background-repeat: no-repeat;
+  background-size: 832px 3456px; background-position: 0 -576px;
+  image-rendering: pixelated;
+  animation: travelAcross 4s linear infinite, travelWalk .7s steps(8) infinite;
+}
+.travel-moon { position: absolute; left: 14%; top: 9px; color: #f4cb75; font-size: 1.05rem; }
+
+.travel-overlay {
+  position: absolute; z-index: 8; inset-inline: 7%; top: 1.2rem; height: 72px;
+  overflow: hidden; display: flex; align-items: center; justify-content: center; gap: .7rem;
+  border: 1px solid rgba(244, 203, 117, .6); border-radius: 8px;
+  background: rgba(20, 13, 27, .9); color: #fff0d1; font-weight: 700;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .3); animation: travelOverlayIn 1.15s ease both;
+}
+.travel-overlay-runner {
+  width: 64px; height: 64px; display: block; background: url('/male.png') no-repeat 0 -576px / 832px 3456px;
+  image-rendering: pixelated; animation: travelWalk .7s steps(8) infinite;
+}
+
+.map-satchel { display: flex; justify-content: center; gap: .4rem; margin-bottom: 1.4rem; }
+.satchel-chip { width: 10px; height: 10px; border-radius: 2px; background: #f4cb75; box-shadow: 0 0 0 2px rgba(244, 203, 117, .25); }
+
+.map-continue {
+  border: 2px solid #ffe7a5; border-radius: 4px; padding: .68rem 1.7rem;
+  color: #31203b; background: #f4cb75; font-weight: 700;
+  box-shadow: 4px 4px 0 #563849; transition: transform .15s, box-shadow .15s;
+}
+.map-continue:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #563849; }
+.map-continue span { margin-right: .5rem; }
+
+/* Talk prompt + status tip */
+.talk-bubble {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  border: 1px solid rgba(244, 203, 117, .6);
+  background: rgba(24, 16, 30, .88);
+  color: #fff0d1;
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  font-size: .82rem;
+  white-space: nowrap;
+  animation: float 2s ease-in-out infinite;
+}
+.game-tip {
+  z-index: 2; position: absolute; right: 50%; bottom: 1.1rem; transform: translateX(50%);
+  padding: .35rem .9rem; border: 1px solid rgba(255, 238, 194, .26); border-radius: 999px;
+  background: rgba(31, 19, 39, .76); color: #fff0c4; font-size: .85rem; white-space: nowrap;
+}
+
+/* Dialogue box: a retro "messaging" bubble — pixel-cut corners, a hard
+   drop-shadow instead of a soft blur, and a bordered pixel tail — instead
+   of a plain rounded panel. */
+.dialogue-box {
+  /* `left`/`top` are set inline per-line to whichever character is talking
+     (see DialogueBox.jsx), and this transform pins the bubble's bottom-tip
+     to that point so it pops up right over their head instead of sitting
+     in a fixed full-width bar. */
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 16px));
+  z-index: 3;
+  min-width: 190px;
+  width: max-content;
+  max-width: min(320px, 62%);
+  border: 3px solid rgba(244, 203, 117, .8);
+  background: rgba(18, 12, 24, .97);
+  color: #fff2df; text-align: right;
+  padding: .7rem 1rem .6rem;
+  clip-path: polygon(
+    9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px),
+    calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px
+  );
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, .55);
+}
+/* Bordered, blocky pixel tail pointing down at the speaker's head — two
+   stacked triangles so the tail reads as outlined, like the bubble itself. */
+.dialogue-box::before {
+  content: '';
+  position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 8px solid transparent; border-right: 8px solid transparent;
+  border-top: 9px solid rgba(244, 203, 117, .8);
+}
+.dialogue-box::after {
+  content: '';
+  position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent; border-right: 5px solid transparent;
+  border-top: 6px solid rgba(18, 12, 24, .97);
+}
+.dialogue-box.speaker-npc { border-color: rgba(244, 203, 117, .85); }
+.dialogue-box.speaker-npc::before { border-top-color: rgba(244, 203, 117, .85); }
+.dialogue-box.speaker-player { border-color: rgba(232, 140, 152, .8); }
+.dialogue-box.speaker-player::before { border-top-color: rgba(232, 140, 152, .8); }
+.dialogue-name { display: block; color: #f1cb78; font-size: .78rem; font-weight: 700; margin-bottom: .3rem; }
+.dialogue-box.speaker-player .dialogue-name { color: #ed9aa4; }
+.dialogue-text { margin: 0; font-size: clamp(.92rem, 2.6vw, 1.08rem); line-height: 1.7; }
+.dialogue-hint { display: block; margin-top: .5rem; color: #cbb6a9; font-size: .76rem; }
+
+/* Thought bubble: a soft cloud with dots trailing down to the character's
+   head — distinct from the spoken, squared-off dialogue box. It floats
+   noticeably higher than head height on purpose: the talk prompt and the
+   NPC's own dialogue always sit at head height, so this silent, lower
+   priority bubble is pinned well above that band and can never cover them,
+   no matter how close the two characters stand. */
+.thought-bubble {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 62px));
+  z-index: 3;
+  min-width: 170px;
+  width: max-content;
+  max-width: min(280px, 58%);
+  border: 2px solid rgba(210, 198, 235, .6);
+  background: rgba(238, 232, 248, .96);
+  color: #3a2c4c;
+  border-radius: 24px;
+  padding: .55rem 1rem;
+  text-align: center;
+  font-size: .84rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .35);
+  pointer-events: none;
+  animation: thoughtIn .3s ease both;
+}
+.thought-bubble p { margin: 0; line-height: 1.6; }
+.thought-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(238, 232, 248, .96);
+  border: 2px solid rgba(210, 198, 235, .6);
+}
+.thought-dot-1 { width: 6px; height: 6px; left: 24%; bottom: -16px; }
+.thought-dot-2 { width: 9px; height: 9px; left: 29%; bottom: -30px; }
+.thought-dot-3 { width: 13px; height: 13px; left: 34%; bottom: -46px; }
+@keyframes thoughtIn {
+  from { opacity: 0; transform: translate(-50%, calc(-100% - 62px)) scale(.8); }
+  to { opacity: 1; transform: translate(-50%, calc(-100% - 62px)) scale(1); }
+}
+
+/* Minigame */
+.minigame-panel {
+  position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 1rem; padding: 1.4rem; text-align: center;
+  background: rgba(15, 9, 20, .72); backdrop-filter: blur(2px);
+}
+.minigame-steps { display: flex; gap: 6px; }
+.minigame-steps span { width: 7px; height: 7px; border-radius: 50%; background: #5c4054; }
+.minigame-steps span.done { background: #f4cb75; }
+.minigame-prompt { margin: 0; color: #fff2df; font-size: clamp(1rem, 3vw, 1.3rem); font-family: 'Marhey', sans-serif; }
+.minigame-options { display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem; max-width: 460px; }
+.minigame-options button {
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+  border: 1px solid rgba(244, 203, 117, .4); border-radius: 10px; background: rgba(35, 24, 40, .85);
+  color: #fff0d1; padding: .7rem .9rem; min-width: 96px; font-size: .84rem;
+  transition: transform .15s, border-color .15s;
+}
+.minigame-options button:hover { transform: translateY(-2px); border-color: rgba(244, 203, 117, .8); }
+.minigame-options button.picked { border-color: #8fce9a; background: rgba(80, 140, 95, .22); transform: scale(1.04); }
+.swatch { width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .2); }
+.option-preview { width: 44px; height: 44px; image-rendering: pixelated; }
+
+/* Gift reveal: a real greeting card whose cover swings open on a hinge
+   (like a book) instead of a flat colour-swap, revealing a surprise GIF
+   underneath. */
+.gift-reveal {
+  position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1.3rem; padding: 1.5rem;
+  background: rgba(15, 9, 20, .78);
+}
+.gift-reveal-heading { margin: 0; color: #fff2df; font-family: 'Marhey', sans-serif; font-size: clamp(1.05rem, 3vw, 1.4rem); }
+.gift-card {
+  position: relative;
+  width: min(300px, 80%);
+  height: 260px;
+  perspective: 1200px;
+  cursor: pointer;
+}
+.gift-card-inside {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem;
+  border-radius: 10px;
+  background: #f8ecdc;
+  color: #442536;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .45);
+  overflow-y: auto;
+}
+.gift-card-inside img { max-width: 100%; max-height: 118px; border-radius: 6px; object-fit: contain; }
+.gift-card-placeholder { font-size: 2.6rem; }
+.gift-card-inside p { margin: 0; font-weight: 700; font-size: .95rem; }
+.gift-card-stage-gif .tenor-gif-embed { max-width: 140px; }
+.gift-card-stage-gif iframe { border-radius: 8px; max-width: 100%; }
+.gift-card-stage-confetti .gift-card-confetti { font-size: 4rem; animation: confettiPop .5s ease both; }
+.gift-card-stage-text .gift-card-final { font-size: 1.2rem; font-family: 'Marhey', sans-serif; }
+@keyframes confettiPop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.gift-card-cover {
+  position: absolute; inset: 0;
+  transform-origin: left center;
+  transform: rotateY(0deg);
+  transition: transform .8s cubic-bezier(.34, 1.56, .64, 1);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  border: 2px solid rgba(244, 203, 117, .55);
+  background: linear-gradient(160deg, #7a4b66, #4c2b46);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem;
+  color: #fff2df;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .45);
+}
+.gift-card-cover > span { font-size: 1.9rem; color: #f4cb75; }
+.gift-card-cover p { margin: 0; font-weight: 700; font-family: 'Marhey', sans-serif; }
+.gift-card-hint { font-size: .78rem; color: #d9c6b3; font-weight: 400; animation: float 2s ease-in-out infinite; }
+.gift-card.open .gift-card-cover { transform: rotateY(-125deg); }
+
+/* Light-hanging finale interaction */
+.light-slot {
+  position: absolute; width: 34px; height: 34px; transform: translate(-50%, -50%);
+  border-radius: 50%; border: 2px dashed rgba(244, 203, 117, .5); background: rgba(74, 60, 70, .35);
+  z-index: 2;
+}
+.light-slot.lit { border-style: solid; border-color: #f4cb75; background: rgba(244, 203, 117, .3); }
+.light-slot:not(.lit):hover { background: rgba(244, 203, 117, .18); }
+
+.delivery-slot {
+  position: absolute; z-index: 2; width: 46px; height: 46px; transform: translate(-50%, -50%);
+  border-radius: 50%; border: 2px dashed rgba(244, 203, 117, .85); cursor: pointer;
+  background: radial-gradient(circle, rgba(244, 203, 117, .32), rgba(244, 203, 117, .06));
+  display: grid; place-items: center;
+  animation: deliveryPulse 1.6s ease-in-out infinite;
+  transition: transform .15s, background .15s;
+}
+.delivery-slot-icon {
+  font-size: 1.25rem; color: #fff1b1; text-shadow: 1px 1px 0 #704643, 0 0 6px rgba(244, 203, 117, .8);
+}
+.delivery-slot:hover { transform: translate(-50%, -50%) scale(1.15); background: radial-gradient(circle, rgba(244, 203, 117, .5), rgba(244, 203, 117, .12)); }
+.delivery-slot.placed {
+  border-style: solid; border-color: #8fce9a; background: rgba(143, 206, 154, .28); animation: none;
+}
+.delivery-slot.placed .delivery-slot-icon { visibility: hidden; }
+@keyframes deliveryPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(244, 203, 117, .4); }
+  50% { box-shadow: 0 0 0 9px rgba(244, 203, 117, 0); }
+}
+
+/* Touch dpad */
+.touch-controls {
+  position: absolute; left: .9rem; bottom: .9rem; z-index: 2;
+  width: 132px; text-align: center;
+}
+.touch-controls > button, .touch-controls div button {
+  width: 40px; height: 36px; color: #f8e3a2;
+  border: 1px solid rgba(244, 206, 119, .44); background: rgba(37, 32, 58, .78);
+  border-radius: 6px; font-family: system-ui, sans-serif; touch-action: none;
+}
+.touch-controls div { display: flex; justify-content: space-between; margin: .2rem 0; }
+.touch-controls button:active { background: #684256; }
+
+@keyframes twinkle { 50% { transform: scale(1.25) rotate(12deg); opacity: .76; } }
+@keyframes float { 50% { transform: translate(-50%, calc(-50% - 5px)); } }
+@keyframes mapPulse { 50% { box-shadow: 0 0 0 9px rgba(244, 203, 117, .1); } }
+@keyframes travelAcross { from { right: -64px; } to { right: calc(100% + 64px); } }
+@keyframes travelWalk {
+  from { background-position: 0 -576px; }
+  to { background-position: -512px -576px; }
+}
+@keyframes introWalk {
+  from { background-position: 0 -576px; }
+  to { background-position: -512px -576px; }
+}
+@keyframes travelOverlayIn {
+  0% { opacity: 0; transform: translateY(-18px); }
+  20%, 80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+@media (max-width: 720px) {
+  .game-page { padding: .85rem .55rem 1.2rem; }
+  .game-header { grid-template-columns: 1fr auto; margin-bottom: .6rem; }
+  .game-header p { display: none; }
+  .game-frame { border-radius: 7px; }
+  .dialogue-text { font-size: .95rem; }
+  .thought-bubble { font-size: .78rem; max-width: 72%; }
+  .minigame-options button { min-width: 84px; padding: .55rem .6rem; font-size: .78rem; }
+  .swatch { width: 24px; height: 24px; }
+  .touch-controls { display: block; }
+  .game-tip { bottom: .55rem; font-size: .72rem; }
+  .map-node-icon { width: 38px; height: 38px; font-size: 1rem; }
+}
+
+@media (min-width: 721px) {
+  .touch-controls { display: none; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .touch-controls { display: block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .talk-bubble, .map-node.active .map-node-icon, .travel-runner, .delivery-slot, .thought-bubble, .gift-card-hint { animation: none; }
+  .gift-card-cover { transition: none; }
+}
