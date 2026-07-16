@@ -24,38 +24,15 @@ function App() {
   const [collected, setCollected] = useState([])
   const [selections, setSelections] = useState({})
   const [traveling, setTraveling] = useState(false)
-  const [hydrated, setHydrated] = useState(false)
 
+  // Never resume mid-journey — every open starts at the intro so nothing
+  // gets spoiled by a leftover save from a previous visit.
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(SAVE_KEY)
-      if (raw) {
-        const saved = JSON.parse(raw)
-        if (typeof saved.stepIndex === 'number') {
-          setStepIndex(Math.min(saved.stepIndex, LOCATIONS.length))
-          setCollected(Array.isArray(saved.collected) ? saved.collected : [])
-          setSelections(saved.selections || {})
-          setPhase('playing')
-        }
-      }
-    } catch {
-      // Start fresh if browser storage is missing or malformed.
-    }
-    setHydrated(true)
+    try { window.localStorage.removeItem(SAVE_KEY) } catch { /* ignore */ }
   }, [])
-
-  useEffect(() => {
-    if (!hydrated) return
-    window.localStorage.setItem(SAVE_KEY, JSON.stringify({
-      stepIndex,
-      collected,
-      selections,
-    }))
-  }, [hydrated, stepIndex, collected, selections])
 
   const restart = () => {
     if (window.confirm('تبدأ المشوار من الأول تاني؟')) {
-      window.localStorage.removeItem(SAVE_KEY)
       setCollected([])
       setSelections({})
       setStepIndex(0)
