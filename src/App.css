@@ -515,6 +515,21 @@ canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; 
     border-radius: 8px;
   }
   .touch-controls .dpad-glyph { font-size: 1rem; }
+
+  /* iPad / large tablets: bigger hit targets, phones stay compact above. */
+  @media (min-width: 768px) {
+    .touch-controls {
+      left: .75rem;
+      bottom: .7rem;
+      width: 176px;
+    }
+    .touch-controls > button, .touch-controls div button {
+      width: 54px;
+      height: 50px;
+      border-radius: 10px;
+    }
+    .touch-controls .dpad-glyph { font-size: 1.35rem; }
+  }
 }
 
 /* Portrait phones: ask to rotate — the game is built for the wide side. */
