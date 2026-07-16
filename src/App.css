@@ -10,6 +10,22 @@
 body { margin: 0; min-width: 320px; background: #111728; }
 button { font: inherit; cursor: pointer; }
 
+/* Stop Safari/iOS from treating taps as text selection / copy callouts. */
+.game-page,
+.game-page button,
+.game-tip,
+.dialogue-box,
+.talk-bubble,
+.thought-bubble,
+.touch-controls,
+.minigame-panel,
+.gift-reveal {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .game-page {
   min-height: 100svh;
   min-height: 100dvh;
@@ -177,6 +193,7 @@ canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; 
   z-index: 2; position: absolute; right: 50%; bottom: 1.1rem; transform: translateX(50%);
   padding: .35rem .9rem; border: 1px solid rgba(255, 238, 194, .26); border-radius: 999px;
   background: rgba(31, 19, 39, .76); color: #fff0c4; font-size: .85rem; white-space: nowrap;
+  pointer-events: none;
 }
 
 /* Dialogue box: a retro "messaging" bubble — pixel-cut corners, a hard
@@ -376,15 +393,29 @@ canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; 
 /* Touch dpad */
 .touch-controls {
   position: absolute; left: .9rem; bottom: .9rem; z-index: 2;
-  width: 132px; text-align: center;
+  width: 148px; text-align: center;
+  touch-action: none;
 }
 .touch-controls > button, .touch-controls div button {
-  width: 40px; height: 36px; color: #f8e3a2;
-  border: 1px solid rgba(244, 206, 119, .44); background: rgba(37, 32, 58, .78);
-  border-radius: 6px; font-family: system-ui, sans-serif; touch-action: none;
+  width: 46px; height: 42px; color: #f8e3a2;
+  border: 1px solid rgba(244, 206, 119, .44); background: rgba(37, 32, 58, .85);
+  border-radius: 8px; font-family: system-ui, sans-serif;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.touch-controls div { display: flex; justify-content: space-between; margin: .2rem 0; }
+.touch-controls div { display: flex; justify-content: space-between; margin: .25rem 0; }
 .touch-controls button:active { background: #684256; }
+.touch-controls .dpad-glyph {
+  display: block;
+  pointer-events: none;
+  font-size: 1.1rem;
+  line-height: 1;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 @keyframes twinkle { 50% { transform: scale(1.25) rotate(12deg); opacity: .76; } }
 @keyframes float { 50% { transform: translate(-50%, calc(-50% - 5px)); } }
@@ -472,17 +503,18 @@ canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; 
 
   .touch-controls {
     display: block;
-    left: .45rem;
-    bottom: .45rem;
-    width: 96px;
-    opacity: .92;
+    left: .55rem;
+    bottom: .55rem;
+    width: 128px;
+    opacity: .95;
   }
   .touch-controls > button, .touch-controls div button {
-    width: 30px;
-    height: 28px;
-    font-size: .85rem;
-    border-radius: 5px;
+    width: 40px;
+    height: 38px;
+    font-size: 1rem;
+    border-radius: 8px;
   }
+  .touch-controls .dpad-glyph { font-size: 1rem; }
 }
 
 /* Portrait phones: ask to rotate — the game is built for the wide side. */
