@@ -12,6 +12,7 @@ button { font: inherit; cursor: pointer; }
 
 .game-page {
   min-height: 100svh;
+  min-height: 100dvh;
   overflow: hidden;
   padding: 1.2rem clamp(0.75rem, 4vw, 4rem) 2rem;
   background:
@@ -19,6 +20,8 @@ button { font: inherit; cursor: pointer; }
     radial-gradient(circle at 85% 100%, rgba(57, 102, 119, .35), transparent 36%),
     #111728;
 }
+
+.rotate-hint { display: none; }
 
 .game-header {
   width: min(1720px, 100%, calc((100svh - 150px) * 16 / 9));
@@ -29,6 +32,7 @@ button { font: inherit; cursor: pointer; }
   color: #d9c6b3;
   gap: .5rem;
 }
+.game-header .game-title,
 .game-header p { margin: 0; font-size: .95rem; color: #e7c878; text-align: center; }
 .header-links { justify-self: end; display: flex; align-items: center; gap: .9rem; }
 .credits-link { color: #a8aabe; font: 500 .76rem ui-monospace, monospace; text-decoration: none; transition: color .2s; }
@@ -40,6 +44,8 @@ button { font: inherit; cursor: pointer; }
   background: rgba(38, 25, 39, .62); color: #f3d894; font-size: .75rem;
 }
 .audio-toggle[aria-pressed='true'] { border-color: #d88983; color: #fff0d1; background: rgba(154, 77, 83, .36); }
+.audio-label-short, .reset-label-short { display: none; }
+.audio-label-full, .reset-label-full { display: inline; }
 
 .game-shell {
   width: min(1720px, 100%, calc((100svh - 150px) * 16 / 9));
@@ -397,30 +403,123 @@ canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; 
   20%, 80% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-10px); }
 }
-
-@media (max-width: 720px) {
-  .game-page { padding: .85rem .55rem 1.2rem; }
-  .game-header { grid-template-columns: 1fr auto; margin-bottom: .6rem; }
-  .game-header p { display: none; }
-  .game-frame { border-radius: 7px; }
-  .dialogue-text { font-size: .95rem; }
-  .thought-bubble { font-size: .78rem; max-width: 72%; }
-  .minigame-options button { min-width: 84px; padding: .55rem .6rem; font-size: .78rem; }
-  .swatch { width: 24px; height: 24px; }
-  .touch-controls { display: block; }
-  .game-tip { bottom: .55rem; font-size: .72rem; }
-  .map-node-icon { width: 38px; height: 38px; font-size: 1rem; }
+@keyframes rotateHint {
+  0%, 100% { transform: rotate(-18deg); }
+  50% { transform: rotate(18deg); }
 }
 
-@media (min-width: 721px) {
+/* Phones / tablets: fill the screen in landscape, keep a slim top bar. */
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+  .game-page {
+    padding: 0;
+    height: 100svh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-header {
+    width: 100%;
+    margin: 0;
+    flex: 0 0 auto;
+    padding: .28rem .55rem;
+    gap: .35rem;
+    background: rgba(12, 10, 20, .92);
+    border-bottom: 1px solid rgba(244, 203, 117, .18);
+    z-index: 5;
+  }
+  .game-header .game-title { font-size: .78rem; white-space: nowrap; }
+  .header-links { gap: .45rem; }
+  .audio-toggle {
+    padding: .15rem .4rem;
+    font-size: .7rem;
+    min-height: 28px;
+  }
+  .reset-link { font-size: .68rem; text-decoration: none; opacity: .85; }
+  .audio-label-short, .reset-label-short { display: inline; }
+  .audio-label-full, .reset-label-full { display: none; }
+
+  .game-shell {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0;
+    display: grid;
+    place-items: center;
+  }
+
+  .game-frame {
+    width: min(100%, calc((100dvh - 36px) * 16 / 9));
+    height: min(calc(100dvh - 36px), calc(100vw * 9 / 16));
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+  }
+  .game-frame::before { box-shadow: none; }
+
+  .dialogue-text { font-size: .88rem; }
+  .thought-bubble { font-size: .72rem; max-width: 68%; }
+  .minigame-options button { min-width: 72px; padding: .45rem .5rem; font-size: .74rem; }
+  .swatch { width: 22px; height: 22px; }
+  .game-tip { bottom: .4rem; font-size: .68rem; padding: .25rem .65rem; }
+  .map-node-icon { width: 34px; height: 34px; font-size: .9rem; }
+  .delivery-slot { width: 36px; height: 36px; }
+  .delivery-slot-icon { font-size: 1rem; }
+  .talk-bubble { font-size: .78rem; padding: .35rem .7rem; }
+
+  .touch-controls {
+    display: block;
+    left: .45rem;
+    bottom: .45rem;
+    width: 96px;
+    opacity: .92;
+  }
+  .touch-controls > button, .touch-controls div button {
+    width: 30px;
+    height: 28px;
+    font-size: .85rem;
+    border-radius: 5px;
+  }
+}
+
+/* Portrait phones: ask to rotate — the game is built for the wide side. */
+@media (orientation: portrait) and (max-width: 900px) {
+  .rotate-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .7rem;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: #111728;
+    color: #fff2df;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  .rotate-hint span {
+    font-size: 2.4rem;
+    color: #f4cb75;
+    animation: rotateHint 1.6s ease-in-out infinite;
+  }
+  .rotate-hint p {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 16rem;
+  }
+  .game-header, .game-shell { visibility: hidden; pointer-events: none; }
+}
+
+@media (min-width: 1025px) and (hover: hover) {
   .touch-controls { display: none; }
 }
 
-@media (hover: none) and (pointer: coarse) {
-  .touch-controls { display: block; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .talk-bubble, .map-node.active .map-node-icon, .travel-runner, .delivery-slot, .thought-bubble, .gift-card-hint { animation: none; }
+  .talk-bubble, .map-node.active .map-node-icon, .travel-runner, .delivery-slot, .thought-bubble, .gift-card-hint, .rotate-hint span { animation: none; }
   .gift-card-cover { transition: none; }
 }

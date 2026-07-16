@@ -67,14 +67,25 @@ function App() {
 
   return (
     <main className="game-page" dir="rtl">
+      <div className="rotate-hint" role="status">
+        <span aria-hidden="true">↻</span>
+        <p>لفّي الجهاز بالعرض عشان تلعبى أحسن</p>
+      </div>
+
       <header className="game-header">
         <span className="brand-spacer" aria-hidden="true" />
-        {phase !== 'intro' && <p>مشوار التعويض 🤣</p>}
+        <p className="game-title">{phase === 'intro' ? 'عيد ميلاد آية' : 'مشوار التعويض 🤣'}</p>
         <div className="header-links">
           <button type="button" className="audio-toggle" onClick={sound.toggle} aria-pressed={sound.enabled}>
-            {sound.enabled ? 'الصوت: شغال' : 'شغّل الصوت'}
+            <span className="audio-label-short">{sound.enabled ? '🔊' : '🔈'}</span>
+            <span className="audio-label-full">{sound.enabled ? 'الصوت: شغال' : 'شغّل الصوت'}</span>
           </button>
-          {phase !== 'intro' && <button type="button" className="reset-link" onClick={restart}>ابدأ من جديد</button>}
+          {phase !== 'intro' && (
+            <button type="button" className="reset-link" onClick={restart}>
+              <span className="reset-label-short">من جديد</span>
+              <span className="reset-label-full">ابدأ من جديد</span>
+            </button>
+          )}
         </div>
       </header>
 
